@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+    <style>
+        body {
+            max-width: 500px;
+            margin: auto;
+            padding: 1em;
+            background: black;
+            color: white;
+            font: 16px/1.6 menlo monospace;
+        }
+    </style>
+    <script src="https://cdn.bootcss.com/jquery/3.5.0/jquery.min.js"></script>
+</head>
+<body>
+    <p>
+        <b>Hi, {{ user }}!</b>
+    </p>
+    <p>
+        message:
+        <input type="text" name="msg" id="in">
+    </p>
+    <pre id="out"></pre>
+    <script>
+        $('#in').keyup((e)=>{
+            if (e.which == 13) {
+                let data = {
+                    'msg': $('#in').val()
+                }
+                $.post('/chat', data)
+                $('#in').val('')
+            }
+        })
+
+        function sse() {
+            let evtSource = new EventSource('/msg')
+            evtSource.onmessage = function(e) {
+                let origin_msg = $('#out').html()
+                let new_msg = `${e.data}\n${origin_msg}`
+                $('#out').html(new_msg)
+            }
+        }
+
+        sse()
+    </script>
+</body>
+</html>
